@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<main class="furniture-page">
+    <header class="furniture-header">
+        <h1>Our Furniture Collection</h1>
+        <p>Find the right sofa for your home, from comfortable family seating to elegant statement pieces.</p>
+    </header>
+
+    <nav class="furniture-categories" aria-label="Furniture categories">
+        <a class="selected" href="#sofas">Sofas</a>
+        <a class="selected" href="#sofas">Chairs</a>
+        <a class="selected" href="#sofas">Beds</a>
+        <a class="selected" href="#sofas">shelves</a>
+    </nav>
+
+    <section class="furniture-grid" id="sofas" aria-label="Sofa collection">
+        {% for product in products %}
+        <article class="furniture-card">
+            <div class="furniture-image-wrap">
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" loading="lazy">
+            </div>
+            <div class="furniture-details">
+                <div class="furniture-copy">
+                    <h2>{{ product.name }}</h2>
+                    <strong>KSh {{ product.price }}</strong>
+                    <div class="product-rating" role="img" aria-label="5 stars">
+                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                        <i class="bi bi-star-fill" aria-hidden="true"></i>
+                    </div>
+                    <p>{{ product.description }}</p>
+                </div>
+                <form class="add-to-cart-form" action="{% url 'add_to_cart' product.id %}" method="post">
+                    {% csrf_token %}
+                    <button class="add-to-cart" type="submit" aria-label="Add {{ product.name }} to cart" title="Add to cart">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6" />
+                        <circle cx="10" cy="20" r="1" />
+                        <circle cx="18" cy="20" r="1" />
+                    </svg>
+                    </button>
+                </form>
+            </div>
+        </article>
+        {% empty %}
+        <p class="empty-products">No furniture is available right now. Please check back soon.</p>
+        {% endfor %}
+    </section>
+</main>
+{% endblock %}

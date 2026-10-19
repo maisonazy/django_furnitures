@@ -1,0 +1,82 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Furnitures</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{% static 'main.css' %}">
+    
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="navbar-shell">
+            <a class="navbar-brand" href="{% url 'main' %}">
+                <svg class="brand-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M7 3v7a3 3 0 0 0 3 3h4a3 3 0 0 0 3-3V3M7 7h10M8 13l-1 8m9-8 1 8M7 17h10" />
+                </svg>
+                <span>Babi's Furnitures</span>
+            </a>
+            <button class="menu-toggle" type="button" aria-label="Open navigation menu" aria-expanded="false" aria-controls="primary-navigation">
+                <i class="bi bi-list" aria-hidden="true"></i>
+            </button>
+            <nav class="nav-overflow" id="primary-navigation" aria-label="Main navigation">
+                <button class="menu-close" type="button" aria-label="Close navigation menu">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+                <ul class="nav nav-underline">
+                <li class="nav-item">
+                <a class="nav-link" href="{% url 'main' %}">Home</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="{% url 'furnitures' %}">Furnitures</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="{% url 'about' %}">About</a>
+                </li>
+                <li class="nav-item">
+                <a class="nav-link" href="{% url 'contact' %}">Contact</a>
+                </li>
+                <li class="nav-item">
+                <a href="{% url 'cart' %}" class="nav-link cart-link" aria-label="Shopping cart, {{ cart_item_count }} items">
+                    <svg class="cart-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6" />
+                        <circle cx="10" cy="20" r="1" />
+                        <circle cx="18" cy="20" r="1" />
+                    </svg>
+                    <span class="cart-count">{{ cart_item_count }}</span>
+                </a>
+                </li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    {% block content %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.min.js" integrity="sha384-G/EV+4j2dNv+tEPo3++6LCgdCROaejBqfUeNjuKAiuXbjrxilcCdDz6ZAVfHWe1Y" crossorigin="anonymous"></script>
+    <script>
+        const siteNavbar = document.querySelector('.navbar');
+        const menuToggle = document.querySelector('.menu-toggle');
+        const menuClose = document.querySelector('.menu-close');
+
+        function setMenuOpen(isOpen) {
+            siteNavbar.classList.toggle('menu-open', isOpen);
+            menuToggle.setAttribute('aria-expanded', String(isOpen));
+        }
+
+        menuToggle.addEventListener('click', () => setMenuOpen(true));
+        menuClose.addEventListener('click', () => setMenuOpen(false));
+        document.querySelectorAll('.nav-overflow a').forEach((link) => {
+            link.addEventListener('click', () => setMenuOpen(false));
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') setMenuOpen(false);
+        });
+    </script>
+
+</body>
+</html>

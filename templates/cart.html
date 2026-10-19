@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<main class="cart-page">
+    <header class="cart-header">
+        <h1>Your cart</h1>
+        <p>Review your furniture selections before you get in touch to order.</p>
+    </header>
+
+    {% if messages %}
+        {% for message in messages %}
+            <p class="cart-notice" role="status">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+
+    {% if items %}
+        <div class="cart-items">
+            {% for item in items %}
+                <article class="cart-item">
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    <div class="cart-item-copy">
+                        <h2>{{ item.product.name }}</h2>
+                        <p>KSh {{ item.product.price }} each</p>
+                    </div>
+                    <form class="cart-quantity-form" action="{% url 'update_cart_item' item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <label for="quantity-{{ item.product.id }}">Quantity</label>
+                        <input id="quantity-{{ item.product.id }}" type="number" name="quantity" min="1" max="99" value="{{ item.quantity }}">
+                        <button type="submit">Update</button>
+                    </form>
+                    <strong class="cart-line-total">KSh {{ item.line_total|floatformat:0 }}</strong>
+                    <form action="{% url 'remove_from_cart' item.product.id %}" method="post">
+                        {% csrf_token %}
+                        <button class="cart-remove" type="submit">Remove</button>
+                    </form>
+                </article>
+            {% endfor %}
+        </div>
+        <div class="cart-summary">
+            <p>Total <strong>KSh {{ total|floatformat:0 }}</strong></p>
+            <p class="cart-summary-note">To place an order, contact us with your cart details.</p>
+            <a class="cart-contact-link" href="{% url 'contact' %}">Contact us to order</a>
+        </div>
+    {% else %}
+        <section class="cart-empty">
+            <i class="bi bi-cart3" aria-hidden="true"></i>
+            <h2>Your cart is empty</h2>
+            <p>Browse the collection and add something you love.</p>
+            <a class="cart-contact-link" href="{% url 'furnitures' %}">Browse furniture</a>
+        </section>
+    {% endif %}
+</main>
+{% endblock %}
