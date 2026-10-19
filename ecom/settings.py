@@ -28,7 +28,20 @@ SECRET_KEY = 'django-insecure-b16p+uo)h^3(bq#2#xz&!$en$hl2i1b2c-n)hawutdenl=518k
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+# Vercel provides these hostnames for deployment and production domains.
+for host_variable in ('VERCEL_URL', 'VERCEL_PROJECT_PRODUCTION_URL'):
+    vercel_host = os.environ.get(host_variable)
+    if vercel_host:
+        ALLOWED_HOSTS.append(vercel_host.removeprefix('https://').removeprefix('http://').split('/')[0])
+
+# Add any custom domains as a comma-separated ALLOWED_HOSTS environment value.
+ALLOWED_HOSTS.extend(
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', '').split(',')
+    if host.strip()
+)
 
 
 # Application definition
