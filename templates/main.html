@@ -2,13 +2,25 @@
 {% load static %}
 {% block content %}
 
-<div class="home">
-    <h1>Welcome to Our Store</h1>
-    <p>Discover amazing products at great prices!</p>
-    <p>At Babi's Store, we offer the best quality items at competitive prices. Shop with us and experience the difference!</p>
-    <a class="shop" href="{% url 'furnitures' %}">Browse products</a>
-</div>
+<main class="home-page">
+    <section class="home-hero">
+        <div class="home-copy">
+            <p class="home-kicker">Babi’s Furnitures · Nairobi</p>
+            <h1>Make room for <span>feeling at home.</span></h1>
+            <p>Discover thoughtful furniture made for everyday living, relaxed gatherings, and the moments that make a house yours.</p>
+            <a class="shop" href="{% url 'furnitures' %}">Explore the collection <i class="bi bi-arrow-right" aria-hidden="true"></i></a>
+        </div>
+        <div class="home-hero-image">
+            <img src="{% static 'imgs/1mg2.webp' %}" alt="Cream sectional sofa in a living room">
+            <span>Comfort, made to stay.</span>
+        </div>
+    </section>
 
-
+    <section class="home-benefits" aria-label="Why shop with Babi's Furnitures">
+        <article><i class="bi bi-house-heart" aria-hidden="true"></i><h2>Made for home</h2><p>Comfortable pieces for the way you live every day.</p></article>
+        <article><i class="bi bi-stars" aria-hidden="true"></i><h2>Style that lasts</h2><p>Find well considered designs for every room.</p></article>
+        <article><i class="bi bi-chat-heart" aria-hidden="true"></i><h2>Here to help</h2><p>Talk to our team when you need a hand choosing.</p></article>
+    </section>
+</main>
 
 {% endblock  %}
