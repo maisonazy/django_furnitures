@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
-from django.core.exceptions import ImproperlyConfigured
+import dj_database_url
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -74,22 +74,24 @@ TEMPLATES = [
 WSGI_APPLICATION = 'ecom.wsgi.application'
 
 
-POSTGRES_PASSWORD = os.environ.get('POSTGRES_PASSWORD')
-if not POSTGRES_PASSWORD:
-    raise ImproperlyConfigured('POSTGRES_PASSWORD must be set to connect to PostgreSQL.')
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB', 'ecom'),
-        'USER': os.environ.get('POSTGRES_USER', 'postgres'),
-        'PASSWORD': POSTGRES_PASSWORD,
-        'HOST': os.environ.get('POSTGRES_HOST', 'localhost'),
-        'PORT': os.environ.get('POSTGRES_PORT', '5432'),
-        'CONN_MAX_AGE': 600,
-        'CONN_HEALTH_CHECKS': True,
+# Vercel and most hosted PostgreSQL providers expose a connection URL.
+# Keep SQLite as a local/build fallback when no database URL is configured.
+DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
+if DATABASE_URL:
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+        )
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 
 # Password validation
