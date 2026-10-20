@@ -13,8 +13,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
-import dj_database_url
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -91,6 +89,9 @@ WSGI_APPLICATION = 'ecom.wsgi.application'
 # Keep SQLite as a local/build fallback when no database URL is configured.
 DATABASE_URL = os.environ.get('DATABASE_URL') or os.environ.get('POSTGRES_URL')
 if DATABASE_URL:
+    # Only require dj-database-url when a hosted database URL is configured.
+    import dj_database_url
+
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
