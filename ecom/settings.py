@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 
+from django.core.exceptions import ImproperlyConfigured
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -20,13 +22,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b16p+uo)h^3(bq#2#xz&!$en$hl2i1b2c-n)hawutdenl=518k'
+# Configure deployment secrets and production mode through environment variables.
+DEBUG = os.environ.get('DEBUG', 'True').lower() in {'1', 'true', 'yes'}
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY')
+if not SECRET_KEY:
+    if DEBUG:
+        SECRET_KEY = 'django-insecure-local-development-only'
+    else:
+        raise ImproperlyConfigured('Set DJANGO_SECRET_KEY in production.')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '.vercel.app']
 
 # Vercel provides these hostnames for deployment and production domains.
 for host_variable in ('VERCEL_URL', 'VERCEL_PROJECT_PRODUCTION_URL'):
@@ -40,6 +45,22 @@ ALLOWED_HOSTS.extend(
     for host in os.environ.get('ALLOWED_HOSTS', '').split(',')
     if host.strip()
 )
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',')
+    if origin.strip()
+]
+for host_variable in ('VERCEL_URL', 'VERCEL_PROJECT_PRODUCTION_URL'):
+    vercel_host = os.environ.get(host_variable)
+    if vercel_host:
+        CSRF_TRUSTED_ORIGINS.append(
+            f"https://{vercel_host.removeprefix('https://').removeprefix('http://').split('/')[0]}"
+        )
+
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
 
 
 # Application definition
@@ -95,10 +116,14 @@ if DATABASE_URL:
     DATABASES = {
         'default': dj_database_url.parse(
             DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=0,
             conn_health_checks=True,
         )
     }
+elif not DEBUG:
+    raise ImproperlyConfigured(
+        'Set DATABASE_URL to a persistent PostgreSQL database in production.'
+    )
 else:
     DATABASES = {
         'default': {
@@ -142,8 +167,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
-MEDIA_URL = "/media/"
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+    ('media', BASE_DIR / 'media'),
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+# Use Django's normal media route locally. On Vercel, committed product images
+# are collected as static assets under /static/media/ instead.
+MEDIA_URL = '/media/' if DEBUG else '/static/media/'
 MEDIA_ROOT = BASE_DIR / "media"
 
 # Default primary key field type
