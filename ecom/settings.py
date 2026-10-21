@@ -61,6 +61,11 @@ for host_variable in ('VERCEL_URL', 'VERCEL_PROJECT_PRODUCTION_URL'):
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
+# Vercel functions do not share a writable filesystem between requests.
+# Keep the small, non-sensitive cart state in a signed cookie in production
+# instead of writing Django sessions to the deployment's SQLite database.
+if os.environ.get('VERCEL') or not DEBUG:
+    SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 
 
 # Application definition
